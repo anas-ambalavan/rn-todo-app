@@ -1,9 +1,16 @@
 import React, { useState } from "react";
-import { Platform, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 
-const AddTodoItem = (props) => {
+const AddTodoItem = ({ addItem }) => {
   const [text, setText] = useState("");
 
   const onChange = (textValue) => setText(textValue);
@@ -16,11 +23,21 @@ const AddTodoItem = (props) => {
         onChangeText={onChange}
         value={text}
       />
-      <Ionicons
-        name={Platform.OS === "ios" ? "ios-add-circle-sharp" : "md-add"}
-        size={30}
-        style={styles.icon}
-      />
+      <TouchableOpacity
+        onPress={() => {
+          addItem(text);
+          setText("");
+        }}
+      >
+        <Ionicons
+          name={
+            Platform.OS === "ios"
+              ? "ios-add-circle-sharp"
+              : "md-add-circle-sharp"
+          }
+          size={30}
+        />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -45,5 +62,4 @@ const styles = StyleSheet.create({
     padding: 8,
     margin: 5,
   },
-  icon: {},
 });
