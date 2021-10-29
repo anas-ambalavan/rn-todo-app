@@ -1,25 +1,27 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
 import Colors from "../constants/Colors";
+import ButtonCmp from "./UI/ButtonCmp";
 
 const HeaderTab = (props) => {
   return (
     <View style={styles.headerContainer}>
-      <HeaderButton
+      <ButtonCmp
         text="All"
         btnColor={Colors.primary}
         textColor={Colors.accent}
         activeTab={props.activeTab}
         setActiveTab={props.setActiveTab}
       />
-      <HeaderButton
+      <ButtonCmp
         text="Completed"
         btnColor={Colors.accent}
         textColor={Colors.primary}
         activeTab={props.activeTab}
         setActiveTab={props.setActiveTab}
       />
-      <HeaderButton
+      <ButtonCmp
         text="Not Completed"
         btnColor={Colors.accent}
         textColor={Colors.primary}
@@ -29,31 +31,6 @@ const HeaderTab = (props) => {
     </View>
   );
 };
-
-const HeaderButton = (props) => (
-  <TouchableOpacity
-    style={{
-      backgroundColor:
-        props.activeTab === props.text ? Colors.primary : Colors.accent,
-      paddingVertical: 6,
-      paddingHorizontal: 16,
-      borderRadius: 30,
-    }}
-    onPress={() => {
-      props.setActiveTab(props.text);
-    }}
-  >
-    <Text
-      style={{
-        color: props.activeTab === props.text ? Colors.accent : Colors.primary,
-        fontSize: 15,
-        fontWeight: "900",
-      }}
-    >
-      {props.text}
-    </Text>
-  </TouchableOpacity>
-);
 
 export default HeaderTab;
 

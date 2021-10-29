@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  TouchableOpacity,
+  Text,
 } from "react-native";
 // import { LinearGradient } from "expo-linear-gradient";
 // import { useDispatch } from "react-redux";
@@ -15,6 +17,7 @@ import {
 import Input from "../components/UI/Input";
 import Card from "../components/UI/Card";
 import Colors from "../constants/Colors";
+import ButtonCmp from "../components/UI/ButtonCmp";
 // import * as authActions from "../../store/actions/auth";
 
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
@@ -137,22 +140,34 @@ const AuthScreen = (props) => {
             {isLoading ? (
               <ActivityIndicator size="small" color={Colors.primary} />
             ) : (
-              <Button
-                title={isSignup ? "SignUp" : "Login"}
-                color={Colors.primary}
-                onPress={authHandler}
+              <ButtonCmp
+                btnStyle="auth"
+                text={isSignup ? "SignUp" : "Login"}
+                btnColor={Colors.primary}
+                textColor={Colors.accent}
+                activeTab={isSignup ? "SignUp" : "Login"}
+                // onPress={authHandler}
               />
             )}
           </View>
           <View style={styles.buttonContainer}>
-            <Button
+            <TouchableOpacity
+              onPress={() => {
+                setIsSignup((prevState) => !prevState);
+              }}
+            >
+              <Text style={styles.bottomText}>{`Switch to ${
+                isSignup ? "Login" : "SignUp"
+              }`}</Text>
+            </TouchableOpacity>
+            {/* <Button
               // style={styles.button}
               title={`Switch to ${isSignup ? "Login" : "SignUp"}`}
               color={Colors.secondary}
               onPress={() => {
                 setIsSignup((prevState) => !prevState);
               }}
-            />
+            /> */}
           </View>
         </ScrollView>
       </Card>
@@ -179,6 +194,11 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 10,
+    alignItems: "center",
+  },
+  bottomText: {
+    color: Colors.secondary,
+    fontSize: 16,
   },
 });
 
