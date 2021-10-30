@@ -11,8 +11,6 @@ import {
   TouchableOpacity,
   Text,
 } from "react-native";
-// import { LinearGradient } from "expo-linear-gradient";
-// import { useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Input from "../components/UI/Input";
@@ -20,6 +18,7 @@ import Card from "../components/UI/Card";
 import Colors from "../constants/Colors";
 import ButtonCmp from "../components/UI/ButtonCmp";
 import axios from "../axios/";
+import useHttp from "../hooks/useHttp";
 // import * as authActions from "../../store/actions/auth";
 
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
@@ -71,53 +70,89 @@ const AuthScreen = ({ signup = false, ...props }) => {
     }
   }, [error]);
 
+  const { sendRequest } = useHttp(false);
+
   const signUp = () => {
-    axios
-      .post("/user/register", {
+    const handleSuccess = (res) => {
+      saveToAsyncStorage(res.data.token, res.data.userId, res.data.expiryDate);
+      props.onScreenChange("todo");
+    };
+    const handleFailure = () => {
+      setIsLoading(false);
+    };
+    sendRequest(
+      `/user/register`,
+      {
         email: formState.inputValues.email,
         pass: formState.inputValues.password,
-      })
-      .then((res) => {
-        saveToAsyncStorage(
-          res.data.token,
-          res.data.userId,
-          res.data.expiryDate
-        );
-        props.onScreenChange("todo");
-      })
-      .catch((err) => {
-        // console.log(err.response.data.message);
-        Alert.alert(
-          "An error occured",
-          err.response.data.message || err.message,
-          [{ text: "Okay" }]
-        );
-        setIsLoading(false);
-      });
+      },
+      "post",
+      handleSuccess,
+      handleFailure
+    );
+    // axios
+    //   .post("/user/register", {
+    //     email: formState.inputValues.email,
+    //     pass: formState.inputValues.password,
+    //   })
+    //   .then((res) => {
+    //     saveToAsyncStorage(
+    //       res.data.token,
+    //       res.data.userId,
+    //       res.data.expiryDate
+    //     );
+    //     props.onScreenChange("todo");
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //     Alert.alert(
+    //       "An error occured",
+    //       (err.response && err.response.data.message) || err.message,
+    //       [{ text: "Okay" }]
+    //     );
+    //     setIsLoading(false);
+    //   });
   };
 
   const login = () => {
-    axios
-      .post("/user/login", {
+    const handleSuccess = (res) => {
+      saveToAsyncStorage(res.data.token, res.data.userId, res.data.expiryDate);
+      props.onScreenChange("todo");
+    };
+    const handleFailure = () => {
+      setIsLoading(false);
+    };
+    sendRequest(
+      `/user/login`,
+      {
         email: formState.inputValues.email,
         pass: formState.inputValues.password,
-      })
-      .then((res) => {
-        saveToAsyncStorage(
-          res.data.token,
-          res.data.userId,
-          res.data.expiryDate
-        );
-        props.onScreenChange("todo");
-      })
-      .catch((err) => {
-        Alert.alert(
-          "An error occured",
-          err.response.data.message || err.message,
-          [{ text: "Okay" }]
-        );
-        setIsLoading(false);
-      });
+      },
+      "post",
+      handleSuccess,
+      handleFailure
+    );
+    // axios
+    //   .post("/user/login", {
+    //     email: formState.inputValues.email,
+    //     pass: formState.inputValues.password,
+    //   })
+    //   .then((res) => {
+    //     saveToAsyncStorage(
+    //       res.data.token,
+    //       res.data.userId,
+    //       res.data.expiryDate
+    //     );
+    //     props.onScreenChange("todo");
+    //   })
+    //   .catch((err) => {
+    //     Alert.alert(
+    //       "An error occured",
+    //       (err.response && err.response.data.message) || err.message,
+    //       [{ text: "Okay" }]
+    //     );
+    //     setIsLoading(false);
+    //   });
   };
 
   // console.log(formState);

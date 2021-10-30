@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useReducer, useCallback } from "react";
 import { Alert } from "react-native";
 
@@ -30,40 +31,85 @@ import axios from "../axios";
 
 //   return state;
 // }
-function useHttp(getToken) {
+function useHttp(useToken = true) {
   //   const [httpState, dispatch] = useReducer(httpReducer, {
   //     status: startWithPending ? "pending" : null,
   //     data: null,
   //     error: null,
   //   });
 
+  const getToken = async () => {
+    const userData = await AsyncStorage.getItem("userData");
+    // console.log(userData);
+    if (userData) return JSON.parse(userData).token;
+
+    return null;
+  };
+
+  const defaultFailureFn = (err) => {
+    Alert.alert(
+      "An error occured",
+      (err.response && err.response.data.message) || err.message,
+      [{ text: "Okay" }]
+    );
+  };
+
   const sendRequest = useCallback(function (
     url,
     data,
     method,
-    successFunction
+    successFunction,
+    failureFunction = defaultFailureFn,
+    finallyFunction = () => {},
+    renderFunction = () => {}
   ) {
-    //   dispatch({ type: "SEND" });
-
-    // dispatch({ type: "SUCCESS", responseData });
-    getToken().then((token) => {
+    const requestFn = (token = null) => {
       axios({
         url,
         data,
         method,
-        token,
+        token: token,
       })
         .then((res) => {
+          console.log(res);
           successFunction(res);
         })
         .catch((err) => {
-          Alert.alert(
-            "An error occured",
-            (err.response && err.response.data.message) || err.message,
-            [{ text: "Okay" }]
-          );
+          failureFunction(err);
+        })
+        .finally(() => {
+          finallyFunction();
         });
-    });
+      if (!token) {
+        renderFunction();
+      }
+    };
+    //   dispatch({ type: "SEND" });
+
+    // dispatch({ type: "SUCCESS", responseData });
+    if (useToken) {
+      getToken().then((token) => {
+        requestFn(token);
+        //   axios({
+        //     url,
+        //     data,
+        //     method,
+        //     token,
+        //   })
+        //     .then((res) => {
+        //       successFunction(res);
+        //     })
+        //     .catch((err) => {
+        //       Alert.alert(
+        //         "An error occured",
+        //         (err.response && err.response.data.message) || err.message,
+        //         [{ text: "Okay" }]
+        //       );
+        //     });
+      });
+    } else {
+      requestFn();
+    }
   },
   []);
 

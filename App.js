@@ -7,6 +7,7 @@ import AppNavigator from "./navigation/AppNavigator";
 import AuthScreen from "./screens/AuthScreen";
 
 import TodoScreen from "./screens/TodoScreen";
+import useHttp from "./hooks/useHttp";
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -15,40 +16,60 @@ export default function App() {
   // const loginHandler = () => {
   //   setValue(true);
   // };
-  const getUser = async () => {
-    const userData = await AsyncStorage.getItem("userData");
-    // console.log(userData);
-    if (userData) return JSON.parse(userData).token;
-
-    return null;
-  };
 
   const changeScreenHandler = (screenName) => {
     setScreen(screenName);
   };
 
+  const { sendRequest } = useHttp();
+
   useEffect(() => {
-    getUser().then((token) => {
-      // console.log(token);
-      if (token) {
-        axios
-          .get("/user/validate", { token })
-          .then((res) => {
-            setScreen("todo");
-          })
-          .catch((err) => {
-            console.log(err.message);
-            // AsyncStorage.removeItem("userData");
-            setScreen("login");
-          })
-          .finally(() => {
-            setIsLoading(false);
-          });
-      } else {
-        setScreen("signup");
-        setIsLoading(false);
-      }
-    });
+    const handleSuccess = () => {
+      setScreen("todo");
+    };
+    const handleFailure = (err) => {
+      console.log(err);
+      // AsyncStorage.removeItem("userData");
+      setScreen("login");
+    };
+    const handleFinally = () => {
+      setIsLoading(false);
+    };
+    const handleAuthScreen = () => {
+      setScreen("signup");
+      setIsLoading(false);
+    };
+    sendRequest(
+      `/user/validate`,
+      null,
+      "get",
+      handleSuccess,
+      handleFailure,
+      handleFinally,
+      handleAuthScreen
+    );
+    // getUser().then((token) => {
+    //   // console.log(token);
+    //   if (token) {
+    //     axios
+    //       .get("/user/validate", { token })
+    //       .then((res) => {
+    //         setScreen("todo");
+    //       })
+    //       .catch((err) => {
+    //         console.log(err.message);
+    //         // AsyncStorage.removeItem("userData");
+    //         setScreen("login");
+    //       })
+    //       .finally(() => {
+    //         setIsLoading(false);
+    //       });
+    //***************************** */
+    //   } else {
+    //     setScreen("signup");
+    //     setIsLoading(false);
+    //   }
+    // });
   }, []);
 
   // return value === true ? (
@@ -66,7 +87,7 @@ export default function App() {
         <AuthScreen signup onScreenChange={changeScreenHandler} />
       );
     } else {
-      componentRendered = <TodoScreen getToken={getUser} />;
+      componentRendered = <TodoScreen />;
     }
   }
 

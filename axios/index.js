@@ -1,15 +1,16 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://rn-todo-app-api.herokuapp.com/api",
+  //   baseURL: "http://localhost:5000/api",
 });
 
 // Add a request interceptor
 instance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
-    // console.log(config);
-    if (!config.url.includes("register") || !config.url.includes("login")) {
+    console.log(config);
+    if (config.token) {
       config.headers["Authorization"] = `Bearer ${config.token}`;
     }
     return config;

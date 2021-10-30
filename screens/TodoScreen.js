@@ -33,10 +33,10 @@ const TodoScreen = (props) => {
 
   const [checkedItems, checkedItemChange] = useState([]);
 
-  const { sendRequest } = useHttp(props.getToken);
+  const { sendRequest } = useHttp();
 
   const deleteItem = (id) => {
-    const handleSuccess = () => {
+    const handleSuccess = (res) => {
       setItems((prevItems) => {
         return prevItems.filter((item) => item.id !== id);
       });
@@ -68,7 +68,7 @@ const TodoScreen = (props) => {
   // Submit the users edits to the overall items state
   const saveEditItem = (id, text) => {
     console.log(text);
-    const handleSuccess = () => {
+    const handleSuccess = (res) => {
       setItems((prevItems) => {
         return prevItems.map((item) =>
           item.id === editItemDetail.id
@@ -133,30 +133,41 @@ const TodoScreen = (props) => {
         { cancelable: true }
       );
     } else {
-      props.getToken().then((token) => {
-        axios
-          .post(
-            "/todos/add",
-            {
-              text,
-              completed: false,
-            },
-            { token }
-          )
-          .then((res) => {
-            console.log(res);
-            setItems((prevItems) => {
-              return [{ ...res.data, id: res.data._id }, ...prevItems];
-            });
-          })
-          .catch((err) => {
-            Alert.alert(
-              "An error occured",
-              err.response.data.message || err.message,
-              [{ text: "Okay" }]
-            );
-          });
-      });
+      const handleSuccess = (res) => {
+        setItems((prevItems) => {
+          return [{ ...res.data, id: res.data._id }, ...prevItems];
+        });
+      };
+      sendRequest(
+        `/todos/add`,
+        { text, completed: false },
+        "post",
+        handleSuccess
+      );
+      // props.getToken().then((token) => {
+      //   axios
+      //     .post(
+      //       "/todos/add",
+      //       {
+      //         text,
+      //         completed: false,
+      //       },
+      //       { token }
+      //     )
+      //     .then((res) => {
+      //       console.log(res);
+      //       setItems((prevItems) => {
+      //         return [{ ...res.data, id: res.data._id }, ...prevItems];
+      //       });
+      //     })
+      //     .catch((err) => {
+      //       Alert.alert(
+      //         "An error occured",
+      //         err.response.data.message || err.message,
+      //         [{ text: "Okay" }]
+      //       );
+      //     });
+      // });
     }
   };
 
@@ -170,85 +181,94 @@ const TodoScreen = (props) => {
   };
 
   const itemChecked = (id) => {
-    props.getToken().then((token) => {
-      const isCompleted = items.find((item) => item.id === id).completed;
-      axios
-        .put(
-          `/todos/update/${id}`,
-          {
-            completed: !isCompleted,
-          },
-          { token }
-        )
-        .then((res) => {
-          // console.log(res);
-          setItems((prevItems) =>
-            prevItems.map((item) => {
-              if (item.id === id) {
-                const updatedItem = { ...item, completed: !item.completed };
-                return updatedItem;
-              }
-              return item;
-            })
-          );
+    const handleSuccess = (res) => {
+      setItems((prevItems) =>
+        prevItems.map((item) => {
+          if (item.id === id) {
+            const updatedItem = { ...item, completed: !item.completed };
+            return updatedItem;
+          }
+          return item;
         })
-        .catch((err) => {
-          Alert.alert(
-            "An error occured",
-            err.response.data.message || err.message,
-            [{ text: "Okay" }]
-          );
-        });
-    });
+      );
+    };
+    const isCompleted = items.find((item) => item.id === id).completed;
+    sendRequest(
+      `/todos/update/${id}`,
+      { completed: !isCompleted },
+      "put",
+      handleSuccess
+    );
+    // props.getToken().then((token) => {
+    //   const isCompleted = items.find((item) => item.id === id).completed;
+    //   axios
+    //     .put(
+    //       `/todos/update/${id}`,
+    //       {
+    //         completed: !isCompleted,
+    //       },
+    //       { token }
+    //     )
+    //     .then((res) => {
+    //       // console.log(res);
+    //       setItems((prevItems) =>
+    //         prevItems.map((item) => {
+    //           if (item.id === id) {
+    //             const updatedItem = { ...item, completed: !item.completed };
+    //             return updatedItem;
+    //           }
+    //           return item;
+    //         })
+    //       );
+    //     })
+    //     .catch((err) => {
+    //       Alert.alert(
+    //         "An error occured",
+    //         err.response.data.message || err.message,
+    //         [{ text: "Okay" }]
+    //       );
+    //     });
+    // });
   };
 
   useEffect(() => {
-    // setItems([
-    //   {
-    //     id: 1,
-    //     text: "Milk",
-    //     completed: false,
-    //   },
-    //   {
-    //     id: 2,
-    //     text: "Eggs",
-    //     completed: false,
-    //   },
-    //   {
-    //     id: 3,
-    //     text: "Bread",
-    //     completed: false,
-    //   },
-    //   {
-    //     id: 4,
-    //     text: "Juice",
-    //     completed: false,
-    //   },
-    // ]);
-    props.getToken().then((token) => {
-      axios
-        .get("/todos/fetch", { token })
-        .then((res) => {
-          console.log(res.data);
-          setItems(
-            res.data.map((item) => {
-              const updatedItem = {
-                ...item,
-                id: item._id,
-              };
-              delete updatedItem["_id"];
-              return updatedItem;
-            })
-          );
+    const handleSuccess = (res) => {
+      setItems(
+        res.data.map((item) => {
+          const updatedItem = {
+            ...item,
+            id: item._id,
+          };
+          delete updatedItem["_id"];
+          return updatedItem;
         })
-        .catch((err) => {
-          Alert.alert(
-            "An error occured",
-            err.response.data.message || err.message,
-            [{ text: "Okay" }]
-          );
-        });
-    });
+      );
+    };
+    sendRequest(`/todos/fetch`, null, "get", handleSuccess);
+    // props.getToken().then((token) => {
+    //   axios
+    //     .get("/todos/fetch", { token })
+    //     .then((res) => {
+    //       console.log(res.data);
+    //       setItems(
+    //         res.data.map((item) => {
+    //           const updatedItem = {
+    //             ...item,
+    //             id: item._id,
+    //           };
+    //           delete updatedItem["_id"];
+    //           return updatedItem;
+    //         })
+    //       );
+    //     })
+    //     .catch((err) => {
+    //       Alert.alert(
+    //         "An error occured",
+    //         err.response.data.message || err.message,
+    //         [{ text: "Okay" }]
+    //       );
+    //     });
+    // });
   }, []);
 
   useEffect(() => {
