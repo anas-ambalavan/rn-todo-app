@@ -13,6 +13,7 @@ const ButtonCmp = (props) => {
           props.activeTab === props.text ? Colors.primary : Colors.accent,
         ...authBtnStyle,
       }}
+      disabled={props.disabled ? props.disabled : false}
       onPress={() => {
         props.setActiveTab ? props.setActiveTab(props.text) : "";
         props.onPress ? props.onPress() : "";

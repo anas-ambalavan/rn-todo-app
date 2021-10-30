@@ -33,7 +33,7 @@ const TodoScreen = (props) => {
   });
   const [checkedItems, checkedItemChange] = useState([]);
 
-  const { sendRequest } = useHttp();
+  const { sendRequest } = useHttp(true, props.onScreenChange);
 
   const deleteItem = (id) => {
     const handleSuccess = (res) => {

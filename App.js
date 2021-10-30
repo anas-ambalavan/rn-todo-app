@@ -51,7 +51,7 @@ export default function App() {
         <AuthScreen signup onScreenChange={changeScreenHandler} />
       );
     } else {
-      componentRendered = <TodoScreen />;
+      componentRendered = <TodoScreen onScreenChange={changeScreenHandler} />;
     }
   }
 

@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import axios from "../axios";
 
-function useHttp(useToken = true) {
+function useHttp(useToken = true, switchToLogin = () => {}) {
   const getToken = async () => {
     const userData = await AsyncStorage.getItem("userData");
     if (userData) return JSON.parse(userData).token;
@@ -17,6 +17,9 @@ function useHttp(useToken = true) {
       (err.response && err.response.data.message) || err.message,
       [{ text: "Okay" }]
     );
+    if (err.response && err.response.status === 401) {
+      switchToLogin("login");
+    }
   };
 
   const sendRequest = useCallback(function (
@@ -24,7 +27,7 @@ function useHttp(useToken = true) {
     data,
     method,
     successFunction,
-    failureFunction = defaultFailureFn,
+    failureFunction = () => {},
     finallyFunction = () => {},
     renderFunction = () => {}
   ) {
@@ -39,19 +42,21 @@ function useHttp(useToken = true) {
           successFunction(res);
         })
         .catch((err) => {
-          failureFunction(err);
+          console.log("err");
+          failureFunction();
+          defaultFailureFn(err);
+
+          // console.log(err.response.status);
         })
         .finally(() => {
           finallyFunction();
         });
-      if (!token) {
-        renderFunction();
-      }
     };
 
     if (useToken) {
       getToken().then((token) => {
-        requestFn(token);
+        if (!token) renderFunction();
+        else requestFn(token);
       });
     } else {
       requestFn();

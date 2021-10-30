@@ -116,14 +116,6 @@ const AuthScreen = ({ signup = false, ...props }) => {
     }
     setError(null);
     setIsLoading(true);
-    // try {
-    //   //   await dispatch(action);
-    //   // props.handler;
-    //   // console.log("hello");
-    // } catch (err) {
-    //   setError(err.message);
-    //   setIsLoading(false);
-    // }
   };
 
   const inputChangeHandler = useCallback(
@@ -191,6 +183,7 @@ const AuthScreen = ({ signup = false, ...props }) => {
                 textColor={Colors.accent}
                 activeTab={isSignup ? "Sign Up" : "Login"}
                 onPress={authHandler}
+                disabled={!formState.formIsValid}
               />
             )}
           </View>
