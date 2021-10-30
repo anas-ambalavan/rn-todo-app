@@ -1,21 +1,14 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "./axios/";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, ActivityIndicator } from "react-native";
+
 import Colors from "./constants/Colors";
-
 import AuthScreen from "./screens/AuthScreen";
-
 import TodoScreen from "./screens/TodoScreen";
 import useHttp from "./hooks/useHttp";
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [screen, setScreen] = useState(null);
-
-  // const loginHandler = () => {
-  //   setValue(true);
-  // };
 
   const changeScreenHandler = (screenName) => {
     setScreen(screenName);
@@ -28,8 +21,6 @@ export default function App() {
       setScreen("todo");
     };
     const handleFailure = (err) => {
-      console.log(err);
-      // AsyncStorage.removeItem("userData");
       setScreen("login");
     };
     const handleFinally = () => {
@@ -48,35 +39,8 @@ export default function App() {
       handleFinally,
       handleAuthScreen
     );
-    // getUser().then((token) => {
-    //   // console.log(token);
-    //   if (token) {
-    //     axios
-    //       .get("/user/validate", { token })
-    //       .then((res) => {
-    //         setScreen("todo");
-    //       })
-    //       .catch((err) => {
-    //         console.log(err.message);
-    //         // AsyncStorage.removeItem("userData");
-    //         setScreen("login");
-    //       })
-    //       .finally(() => {
-    //         setIsLoading(false);
-    //       });
-    //***************************** */
-    //   } else {
-    //     setScreen("signup");
-    //     setIsLoading(false);
-    //   }
-    // });
   }, []);
 
-  // return value === true ? (
-  //   <TodoScreen />
-  // ) : (
-  //   <AuthScreen handler={loginHandler} />
-  // );
   let componentRendered = null;
 
   if (!isLoading && screen) {
