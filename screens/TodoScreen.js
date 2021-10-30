@@ -6,7 +6,11 @@ import {
   Text,
   View,
   Alert,
+  Platform,
+  KeyboardAvoidingView,
 } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import AddTodoItem from "../components/AddTodoItem";
 import HeaderTab from "../components/HeaderTab";
 import TodoListItem from "../components/TodoListItem";
@@ -98,22 +102,24 @@ const TodoScreen = (props) => {
     return editStatusChange(!editStatus);
   };
 
-  const itemChecked = (id) => {
+  const itemChecked = (id, value) => {
     const handleSuccess = (res) => {
       setItems((prevItems) =>
         prevItems.map((item) => {
           if (item.id === id) {
-            const updatedItem = { ...item, completed: !item.completed };
+            const updatedItem = { ...item, completed: value };
+            console.log(updatedItem);
             return updatedItem;
           }
           return item;
         })
       );
     };
-    const isCompleted = items.find((item) => item.id === id).completed;
+    // const isCompleted = items.find((item) => item.id === id).completed;
+
     sendRequest(
       `/todos/update/${id}`,
-      { completed: !isCompleted },
+      { completed: value },
       "put",
       handleSuccess
     );
@@ -148,35 +154,40 @@ const TodoScreen = (props) => {
     return notCompleted;
   };
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <View style={styles.container}>
-        <Text style={styles.headerText}>Todo App</Text>
-        <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} />
-        <AddTodoItem addItem={addItem} />
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "android" ? 100 : 40}
+    >
+      {/* <View > */}
+      <Text style={styles.headerText}>Todo App</Text>
+      <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} />
+      <AddTodoItem addItem={addItem} />
 
-        {activeItems().length ? (
-          <FlatList
-            keyExtractor={(item) => item.id}
-            data={activeItems()}
-            renderItem={({ item }) => (
-              <TodoListItem
-                item={item}
-                deleteItem={deleteItem}
-                editItem={editItem}
-                isEditing={editStatus}
-                editItemDetail={editItemDetail}
-                saveEditItem={saveEditItem}
-                handleEditChange={handleEditChange}
-                itemChecked={itemChecked}
-                checkedItems={checkedItems}
-              />
-            )}
-          />
-        ) : (
-          <Text style={styles.todoText}>No Todo Found</Text>
-        )}
-      </View>
-    </SafeAreaView>
+      {activeItems().length ? (
+        <FlatList
+          style={{ flex: 1 }}
+          keyExtractor={(item) => item.id}
+          data={activeItems()}
+          renderItem={({ item }) => (
+            <TodoListItem
+              item={item}
+              deleteItem={deleteItem}
+              editItem={editItem}
+              isEditing={editStatus}
+              editItemDetail={editItemDetail}
+              saveEditItem={saveEditItem}
+              handleEditChange={handleEditChange}
+              itemChecked={itemChecked}
+              checkedItems={checkedItems}
+            />
+          )}
+        />
+      ) : (
+        <Text style={styles.todoText}>No Todo Found</Text>
+      )}
+      {/* </View> */}
+    </KeyboardAvoidingView>
   );
 };
 
@@ -184,11 +195,12 @@ export default TodoScreen;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     alignItems: "center",
     marginTop: 40,
   },
   headerText: {
-    fontWeight: "900",
+    fontWeight: Platform.OS === "android" ? "bold" : "900",
     fontSize: 20,
     marginVertical: 30,
   },

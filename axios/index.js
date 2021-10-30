@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const instance = axios.create({
-  // baseURL: "https://rn-todo-app-api.herokuapp.com/api",
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://rn-todo-app-api.herokuapp.com/api",
+  // baseURL: "http://localhost:5000/api",
 });
 
 // Add a request interceptor

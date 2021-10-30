@@ -109,7 +109,6 @@ const AuthScreen = ({ signup = false, ...props }) => {
   };
 
   const authHandler = async () => {
-    let action;
     if (isSignup) {
       signUp();
     } else {
@@ -117,14 +116,14 @@ const AuthScreen = ({ signup = false, ...props }) => {
     }
     setError(null);
     setIsLoading(true);
-    try {
-      //   await dispatch(action);
-      // props.handler;
-      // console.log("hello");
-    } catch (err) {
-      setError(err.message);
-      setIsLoading(false);
-    }
+    // try {
+    //   //   await dispatch(action);
+    //   // props.handler;
+    //   // console.log("hello");
+    // } catch (err) {
+    //   setError(err.message);
+    //   setIsLoading(false);
+    // }
   };
 
   const inputChangeHandler = useCallback(
@@ -156,6 +155,7 @@ const AuthScreen = ({ signup = false, ...props }) => {
       style={styles.screen}
     >
       <Card style={styles.authContainer}>
+        <Text style={styles.headerText}>{isSignup ? "Sign Up" : "Login"}</Text>
         <ScrollView>
           <Input
             id="email"
@@ -243,6 +243,11 @@ const styles = StyleSheet.create({
   bottomText: {
     color: Colors.secondary,
     fontSize: 16,
+  },
+  headerText: {
+    fontWeight: Platform.OS === "android" ? "bold" : "900",
+    fontSize: 20,
+    marginVertical: 30,
   },
 });
 

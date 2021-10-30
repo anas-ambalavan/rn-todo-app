@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
+  KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
@@ -29,8 +30,10 @@ const TodoListItem = ({
   //   const [checkBoxValue, setcheckBoxValue] = useState(
   //     checked.length ? true : false
   //   );
+  // console.log(checkedItemText);
   return (
     // <View style={styles.listItem}>
+
     <View style={styles.listItemContainer}>
       <View style={styles.listItemLeft}>
         {isEditing && editItemDetail.id === item.id ? (
@@ -46,7 +49,8 @@ const TodoListItem = ({
               iconStyle={{ borderColor: Colors.secondary, borderRadius: 8 }}
               fillColor={Colors.primary}
               onPress={(value) => {
-                itemChecked(item.id);
+                console.log(value);
+                itemChecked(item.id, value);
                 // setcheckBoxValue(checked.length ? true : false);
               }}
               isChecked={item.completed ? true : false}
@@ -57,9 +61,10 @@ const TodoListItem = ({
               //     // console.log(checkBoxValue);
               //     itemChecked(item.id, item.text);
               //   }}
-              style={
-                item.completed ? styles.checkedItemText : styles.listItemText
-              }
+              style={[
+                item.completed ? styles.checkedItemText : null,
+                styles.itemText,
+              ]}
             >
               {item.text}
             </Text>
@@ -104,6 +109,7 @@ const TodoListItem = ({
         </TouchableOpacity>
       </View>
     </View>
+
     // </View>
   );
 };
@@ -130,11 +136,15 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    // alignItems: "flex-end",
     width: 70,
   },
   checkedItemText: {
     textDecorationLine: "line-through",
+  },
+  itemText: {
     color: Colors.primary,
+  },
+  editItemInput: {
+    width: "80%",
   },
 });
