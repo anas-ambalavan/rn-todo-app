@@ -11,14 +11,11 @@ import AddTodoItem from "../components/AddTodoItem";
 import HeaderTab from "../components/HeaderTab";
 import TodoListItem from "../components/TodoListItem";
 
-import axios from "../axios/";
 import useHttp from "../hooks/useHttp";
 
 const TodoScreen = (props) => {
   const [activeTab, setActiveTab] = useState("All");
-
   const [items, setItems] = useState([]);
-  // const [filteredItems, setFilteredItems] = useState(items);
   const [completed, setCompleted] = useState(items);
   const [notCompleted, setNotCompleted] = useState(items);
 
@@ -30,7 +27,6 @@ const TodoScreen = (props) => {
     id: null,
     text: null,
   });
-
   const [checkedItems, checkedItemChange] = useState([]);
 
   const { sendRequest } = useHttp();
@@ -42,32 +38,10 @@ const TodoScreen = (props) => {
       });
     };
     sendRequest(`/todos/delete/${id}`, null, "delete", handleSuccess);
-    // props.getToken().then((token) => {
-    //   axios
-    //     .delete(
-    //       `/todos/delete/${id}`,
-
-    //       { token }
-    //     )
-    //     .then((res) => {
-    //       // console.log(res);
-    //       setItems((prevItems) => {
-    //         return prevItems.filter((item) => item.id !== id);
-    //       });
-    //     })
-    //     .catch((err) => {
-    //       Alert.alert(
-    //         "An error occured",
-    //         err.response.data.message || err.message,
-    //         [{ text: "Okay" }]
-    //       );
-    //     });
-    // });
   };
 
   // Submit the users edits to the overall items state
   const saveEditItem = (id, text) => {
-    console.log(text);
     const handleSuccess = (res) => {
       setItems((prevItems) => {
         return prevItems.map((item) =>
@@ -80,44 +54,12 @@ const TodoScreen = (props) => {
       editStatusChange(!editStatus);
     };
     sendRequest(`/todos/update/${id}`, { text }, "put", handleSuccess);
-    // props.getToken().then((token) => {
-    //   axios
-    //     .put(
-    //       `/todos/update/${id}`,
-    //       {
-    //         text,
-    //       },
-    //       { token }
-    //     )
-    //     .then((res) => {
-    //       // console.log(res);
-    //       setItems((prevItems) => {
-    //         return prevItems.map((item) =>
-    //           item.id === editItemDetail.id
-    //             ? { ...item, text: editItemDetail.text }
-    //             : item
-    //         );
-    //       });
-    //       // Flip edit status back to false
-    //       editStatusChange(!editStatus);
-    //     })
-    //     .catch((err) => {
-    //       Alert.alert(
-    //         "An error occured",
-    //         err.response.data.message || err.message,
-    //         [{ text: "Okay" }]
-    //       );
-    //     });
-    // });
   };
 
   // Event handler to capture users text input as they edit an item
   const handleEditChange = (text) => {
-    // console.log(text);
     editItemDetailChange({ id: editItemDetail.id, text: text });
   };
-
-  // console.log(props.getToken());
 
   const addItem = (text) => {
     if (!text) {
@@ -144,30 +86,6 @@ const TodoScreen = (props) => {
         "post",
         handleSuccess
       );
-      // props.getToken().then((token) => {
-      //   axios
-      //     .post(
-      //       "/todos/add",
-      //       {
-      //         text,
-      //         completed: false,
-      //       },
-      //       { token }
-      //     )
-      //     .then((res) => {
-      //       console.log(res);
-      //       setItems((prevItems) => {
-      //         return [{ ...res.data, id: res.data._id }, ...prevItems];
-      //       });
-      //     })
-      //     .catch((err) => {
-      //       Alert.alert(
-      //         "An error occured",
-      //         err.response.data.message || err.message,
-      //         [{ text: "Okay" }]
-      //       );
-      //     });
-      // });
     }
   };
 
@@ -199,36 +117,6 @@ const TodoScreen = (props) => {
       "put",
       handleSuccess
     );
-    // props.getToken().then((token) => {
-    //   const isCompleted = items.find((item) => item.id === id).completed;
-    //   axios
-    //     .put(
-    //       `/todos/update/${id}`,
-    //       {
-    //         completed: !isCompleted,
-    //       },
-    //       { token }
-    //     )
-    //     .then((res) => {
-    //       // console.log(res);
-    //       setItems((prevItems) =>
-    //         prevItems.map((item) => {
-    //           if (item.id === id) {
-    //             const updatedItem = { ...item, completed: !item.completed };
-    //             return updatedItem;
-    //           }
-    //           return item;
-    //         })
-    //       );
-    //     })
-    //     .catch((err) => {
-    //       Alert.alert(
-    //         "An error occured",
-    //         err.response.data.message || err.message,
-    //         [{ text: "Okay" }]
-    //       );
-    //     });
-    // });
   };
 
   useEffect(() => {
@@ -245,30 +133,6 @@ const TodoScreen = (props) => {
       );
     };
     sendRequest(`/todos/fetch`, null, "get", handleSuccess);
-    // props.getToken().then((token) => {
-    //   axios
-    //     .get("/todos/fetch", { token })
-    //     .then((res) => {
-    //       console.log(res.data);
-    //       setItems(
-    //         res.data.map((item) => {
-    //           const updatedItem = {
-    //             ...item,
-    //             id: item._id,
-    //           };
-    //           delete updatedItem["_id"];
-    //           return updatedItem;
-    //         })
-    //       );
-    //     })
-    //     .catch((err) => {
-    //       Alert.alert(
-    //         "An error occured",
-    //         err.response.data.message || err.message,
-    //         [{ text: "Okay" }]
-    //       );
-    //     });
-    // });
   }, []);
 
   useEffect(() => {
@@ -287,11 +151,7 @@ const TodoScreen = (props) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <View style={styles.container}>
         <Text style={styles.headerText}>Todo App</Text>
-        <HeaderTab
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          // setFilter={setFilter}
-        />
+        <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} />
         <AddTodoItem addItem={addItem} />
 
         {activeItems().length ? (
@@ -324,11 +184,8 @@ export default TodoScreen;
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    // backgroundColor: "#fff",
     alignItems: "center",
     marginTop: 40,
-    // justifyContent: "center",
   },
   headerText: {
     fontWeight: "900",
