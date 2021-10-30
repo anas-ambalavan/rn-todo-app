@@ -13,11 +13,13 @@ import {
 } from "react-native";
 // import { LinearGradient } from "expo-linear-gradient";
 // import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Input from "../components/UI/Input";
 import Card from "../components/UI/Card";
 import Colors from "../constants/Colors";
 import ButtonCmp from "../components/UI/ButtonCmp";
+import axios from "../axios/";
 // import * as authActions from "../../store/actions/auth";
 
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
@@ -45,10 +47,10 @@ const formReducer = (state, action) => {
   return state;
 };
 
-const AuthScreen = (props) => {
+const AuthScreen = ({ signup = false, ...props }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
-  const [isSignup, setIsSignup] = useState(false);
+  const [isSignup, setIsSignup] = useState(signup);
   //   const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
@@ -69,25 +71,70 @@ const AuthScreen = (props) => {
     }
   }, [error]);
 
+  const signUp = () => {
+    axios
+      .post("/user/register", {
+        email: formState.inputValues.email,
+        pass: formState.inputValues.password,
+      })
+      .then((res) => {
+        saveToAsyncStorage(
+          res.data.token,
+          res.data.userId,
+          res.data.expiryDate
+        );
+        props.onScreenChange("todo");
+      })
+      .catch((err) => {
+        // console.log(err.response.data.message);
+        Alert.alert(
+          "An error occured",
+          err.response.data.message || err.message,
+          [{ text: "Okay" }]
+        );
+        setIsLoading(false);
+      });
+  };
+
+  const login = () => {
+    axios
+      .post("/user/login", {
+        email: formState.inputValues.email,
+        pass: formState.inputValues.password,
+      })
+      .then((res) => {
+        saveToAsyncStorage(
+          res.data.token,
+          res.data.userId,
+          res.data.expiryDate
+        );
+        props.onScreenChange("todo");
+      })
+      .catch((err) => {
+        Alert.alert(
+          "An error occured",
+          err.response.data.message || err.message,
+          [{ text: "Okay" }]
+        );
+        setIsLoading(false);
+      });
+  };
+
+  // console.log(formState);
+
   const authHandler = async () => {
     let action;
-    // if (isSignup) {
-    //   action = authActions.signup(
-    //     formState.inputValues.email,
-    //     formState.inputValues.password
-    //   );
-    // } else {
-    //   action = authActions.login(
-    //     formState.inputValues.email,
-    //     formState.inputValues.password
-    //   );
-    // }
+    if (isSignup) {
+      signUp();
+    } else {
+      login();
+    }
     setError(null);
     setIsLoading(true);
     try {
       //   await dispatch(action);
-      //   props.navigation.navigate("");
-      console.log("hello");
+      // props.handler;
+      // console.log("hello");
     } catch (err) {
       setError(err.message);
       setIsLoading(false);
@@ -105,6 +152,17 @@ const AuthScreen = (props) => {
     },
     [dispatchFormState]
   );
+
+  const saveToAsyncStorage = (token, userId, expirationDate) => {
+    AsyncStorage.setItem(
+      "userData",
+      JSON.stringify({
+        token: token,
+        userId: userId,
+        expiryDate: expirationDate,
+      })
+    );
+  };
 
   return (
     <KeyboardAvoidingView
@@ -142,11 +200,11 @@ const AuthScreen = (props) => {
             ) : (
               <ButtonCmp
                 btnStyle="auth"
-                text={isSignup ? "SignUp" : "Login"}
+                text={isSignup ? "Sign Up" : "Login"}
                 btnColor={Colors.primary}
                 textColor={Colors.accent}
-                activeTab={isSignup ? "SignUp" : "Login"}
-                // onPress={authHandler}
+                activeTab={isSignup ? "Sign Up" : "Login"}
+                onPress={authHandler}
               />
             )}
           </View>
@@ -157,7 +215,7 @@ const AuthScreen = (props) => {
               }}
             >
               <Text style={styles.bottomText}>{`Switch to ${
-                isSignup ? "Login" : "SignUp"
+                isSignup ? "Login" : "Sign Up"
               }`}</Text>
             </TouchableOpacity>
             {/* <Button

@@ -57,6 +57,7 @@ const Input = (props) => {
       isValid = false;
     }
     dispatch({ type: INPUT_CHANGE, value: text, isValid: isValid });
+    lostFocusHandler();
   };
 
   const lostFocusHandler = () => {
@@ -71,7 +72,7 @@ const Input = (props) => {
         style={styles.input}
         value={inputState.value}
         onChangeText={textChangeHandler}
-        onBlur={lostFocusHandler}
+        // onBlur={lostFocusHandler}
       />
       {!inputState.isValid && inputState.touched && (
         <View style={styles.errorContainer}>

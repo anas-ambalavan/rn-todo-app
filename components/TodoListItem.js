@@ -73,7 +73,9 @@ const TodoListItem = ({
         ]}
       >
         {isEditing && editItemDetail.id === item.id ? (
-          <TouchableOpacity onPress={() => saveEditItem(item.id, item.text)}>
+          <TouchableOpacity
+            onPress={() => saveEditItem(item.id, editItemDetail.text)}
+          >
             <Ionicons
               name={Platform.OS === "ios" ? "ios-save" : "md-save"}
               size={25}

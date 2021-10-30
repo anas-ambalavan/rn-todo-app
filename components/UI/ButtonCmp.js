@@ -15,6 +15,7 @@ const ButtonCmp = (props) => {
       }}
       onPress={() => {
         props.setActiveTab ? props.setActiveTab(props.text) : "";
+        props.onPress ? props.onPress() : "";
       }}
     >
       <Text

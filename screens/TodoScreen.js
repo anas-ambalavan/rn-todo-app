@@ -11,7 +11,10 @@ import AddTodoItem from "../components/AddTodoItem";
 import HeaderTab from "../components/HeaderTab";
 import TodoListItem from "../components/TodoListItem";
 
-const TodoScreen = () => {
+import axios from "../axios/";
+import useHttp from "../hooks/useHttp";
+
+const TodoScreen = (props) => {
   const [activeTab, setActiveTab] = useState("All");
 
   const [items, setItems] = useState([]);
@@ -30,30 +33,91 @@ const TodoScreen = () => {
 
   const [checkedItems, checkedItemChange] = useState([]);
 
+  const { sendRequest } = useHttp(props.getToken);
+
   const deleteItem = (id) => {
-    console.log(id);
-    setItems((prevItems) => {
-      return prevItems.filter((item) => item.id !== id);
-    });
+    const handleSuccess = () => {
+      setItems((prevItems) => {
+        return prevItems.filter((item) => item.id !== id);
+      });
+    };
+    sendRequest(`/todos/delete/${id}`, null, "delete", handleSuccess);
+    // props.getToken().then((token) => {
+    //   axios
+    //     .delete(
+    //       `/todos/delete/${id}`,
+
+    //       { token }
+    //     )
+    //     .then((res) => {
+    //       // console.log(res);
+    //       setItems((prevItems) => {
+    //         return prevItems.filter((item) => item.id !== id);
+    //       });
+    //     })
+    //     .catch((err) => {
+    //       Alert.alert(
+    //         "An error occured",
+    //         err.response.data.message || err.message,
+    //         [{ text: "Okay" }]
+    //       );
+    //     });
+    // });
   };
 
   // Submit the users edits to the overall items state
   const saveEditItem = (id, text) => {
-    setItems((prevItems) => {
-      return prevItems.map((item) =>
-        item.id === editItemDetail.id
-          ? { ...item, text: editItemDetail.text }
-          : item
-      );
-    });
-    // Flip edit status back to false
-    editStatusChange(!editStatus);
+    console.log(text);
+    const handleSuccess = () => {
+      setItems((prevItems) => {
+        return prevItems.map((item) =>
+          item.id === editItemDetail.id
+            ? { ...item, text: editItemDetail.text }
+            : item
+        );
+      });
+      // Flip edit status back to false
+      editStatusChange(!editStatus);
+    };
+    sendRequest(`/todos/update/${id}`, { text }, "put", handleSuccess);
+    // props.getToken().then((token) => {
+    //   axios
+    //     .put(
+    //       `/todos/update/${id}`,
+    //       {
+    //         text,
+    //       },
+    //       { token }
+    //     )
+    //     .then((res) => {
+    //       // console.log(res);
+    //       setItems((prevItems) => {
+    //         return prevItems.map((item) =>
+    //           item.id === editItemDetail.id
+    //             ? { ...item, text: editItemDetail.text }
+    //             : item
+    //         );
+    //       });
+    //       // Flip edit status back to false
+    //       editStatusChange(!editStatus);
+    //     })
+    //     .catch((err) => {
+    //       Alert.alert(
+    //         "An error occured",
+    //         err.response.data.message || err.message,
+    //         [{ text: "Okay" }]
+    //       );
+    //     });
+    // });
   };
 
   // Event handler to capture users text input as they edit an item
   const handleEditChange = (text) => {
+    // console.log(text);
     editItemDetailChange({ id: editItemDetail.id, text: text });
   };
+
+  // console.log(props.getToken());
 
   const addItem = (text) => {
     if (!text) {
@@ -69,11 +133,29 @@ const TodoScreen = () => {
         { cancelable: true }
       );
     } else {
-      setItems((prevItems) => {
-        return [
-          { id: Math.random().toLocaleString(), text: text },
-          ...prevItems,
-        ];
+      props.getToken().then((token) => {
+        axios
+          .post(
+            "/todos/add",
+            {
+              text,
+              completed: false,
+            },
+            { token }
+          )
+          .then((res) => {
+            console.log(res);
+            setItems((prevItems) => {
+              return [{ ...res.data, id: res.data._id }, ...prevItems];
+            });
+          })
+          .catch((err) => {
+            Alert.alert(
+              "An error occured",
+              err.response.data.message || err.message,
+              [{ text: "Okay" }]
+            );
+          });
       });
     }
   };
@@ -88,95 +170,85 @@ const TodoScreen = () => {
   };
 
   const itemChecked = (id) => {
-    setItems((prevItems) =>
-      prevItems.map((item) => {
-        if (item.id === id) {
-          const updatedItem = { ...item, completed: !item.completed };
-          return updatedItem;
-        }
-        return item;
-      })
-    );
-
-    // const isChecked = checkedItems.filter(
-    //   (checkedItem) => checkedItem.id === id
-    // );
-    // isChecked.length
-    //   ? // remove item from checked items state (uncheck)
-    //     checkedItemChange((prevItems) => {
-    //       return [...prevItems.filter((item) => item.id !== id)];
-    //     })
-    //   : // Add item to checked items state
-    //     checkedItemChange((prevItems) => {
-    //       return [
-    //         ...prevItems.filter((item) => item.id !== id),
-    //         { id, text, completed: true },
-    //       ];
-    //     });
+    props.getToken().then((token) => {
+      const isCompleted = items.find((item) => item.id === id).completed;
+      axios
+        .put(
+          `/todos/update/${id}`,
+          {
+            completed: !isCompleted,
+          },
+          { token }
+        )
+        .then((res) => {
+          // console.log(res);
+          setItems((prevItems) =>
+            prevItems.map((item) => {
+              if (item.id === id) {
+                const updatedItem = { ...item, completed: !item.completed };
+                return updatedItem;
+              }
+              return item;
+            })
+          );
+        })
+        .catch((err) => {
+          Alert.alert(
+            "An error occured",
+            err.response.data.message || err.message,
+            [{ text: "Okay" }]
+          );
+        });
+    });
   };
 
-  // const completed = () => {
-  //   // console.log(checkedItems[]);
-  //   const isChecked = checkedItems.filter(
-  //     (checkedItem) => checkedItem.id === id
-  //   );
-  //   console.log(isChecked.length);
-  //   setFilteredItems(() =>
-  //     items.filter((item) => item.id === checkedItems[0]?.id)
-  //   );
-  // };
-
-  // const notCompleted = () => {
-  //   setFilteredItems(() => items.filter((item) => item.id !== checkedItems.id));
-  // };
-  // const allTodos = () => {
-  //   setFilteredItems(items);
-  // };
-
-  // const setFilter = (filter) => {
-  //   // setFilteredItems((prevItems) => [
-  //   //   ...prevItems.filter((item) => item.id === items.id),
-  //   // ]);
-  //   // console.log(filteredItems.filter((item) => item.completed === true));
-  //   // if (filter === "completed") {
-  //   //   setCompleted((prevItems) =>
-  //   //     prevItems.filter((item) => item.completed === true)
-  //   //   );
-  //   //   console.log("complete");
-  //   // } else if (filter === "not") {
-  //   //   setFilteredItems(
-  //   //     filter((item) => item.completed === false),
-  //   //     console.log("nocomplete")
-  //   //   );
-  //   // } else if (filter === "all") {
-  //   //   setFilteredItems(items);
-  //   // }
-  //   // console.log(filter);
-  // };
-
   useEffect(() => {
-    setItems([
-      {
-        id: 1,
-        text: "Milk",
-        completed: false,
-      },
-      {
-        id: 2,
-        text: "Eggs",
-        completed: false,
-      },
-      {
-        id: 3,
-        text: "Bread",
-        completed: false,
-      },
-      {
-        id: 4,
-        text: "Juice",
-        completed: false,
-      },
-    ]);
+    // setItems([
+    //   {
+    //     id: 1,
+    //     text: "Milk",
+    //     completed: false,
+    //   },
+    //   {
+    //     id: 2,
+    //     text: "Eggs",
+    //     completed: false,
+    //   },
+    //   {
+    //     id: 3,
+    //     text: "Bread",
+    //     completed: false,
+    //   },
+    //   {
+    //     id: 4,
+    //     text: "Juice",
+    //     completed: false,
+    //   },
+    // ]);
+    props.getToken().then((token) => {
+      axios
+        .get("/todos/fetch", { token })
+        .then((res) => {
+          console.log(res.data);
+          setItems(
+            res.data.map((item) => {
+              const updatedItem = {
+                ...item,
+                id: item._id,
+              };
+              delete updatedItem["_id"];
+              return updatedItem;
+            })
+          );
+        })
+        .catch((err) => {
+          Alert.alert(
+            "An error occured",
+            err.response.data.message || err.message,
+            [{ text: "Okay" }]
+          );
+        });
+    });
   }, []);
 
   useEffect(() => {
@@ -204,7 +276,7 @@ const TodoScreen = () => {
 
         {activeItems().length ? (
           <FlatList
-            // keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.id}
             data={activeItems()}
             renderItem={({ item }) => (
               <TodoListItem
