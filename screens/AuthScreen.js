@@ -4,7 +4,6 @@ import {
   View,
   KeyboardAvoidingView,
   StyleSheet,
-  Button,
   ActivityIndicator,
   Alert,
   Platform,
@@ -17,9 +16,7 @@ import Input from "../components/UI/Input";
 import Card from "../components/UI/Card";
 import Colors from "../constants/Colors";
 import ButtonCmp from "../components/UI/ButtonCmp";
-import axios from "../axios/";
 import useHttp from "../hooks/useHttp";
-// import * as authActions from "../../store/actions/auth";
 
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
 
@@ -50,7 +47,6 @@ const AuthScreen = ({ signup = false, ...props }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
   const [isSignup, setIsSignup] = useState(signup);
-  //   const dispatch = useDispatch();
 
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
@@ -90,28 +86,6 @@ const AuthScreen = ({ signup = false, ...props }) => {
       handleSuccess,
       handleFailure
     );
-    // axios
-    //   .post("/user/register", {
-    //     email: formState.inputValues.email,
-    //     pass: formState.inputValues.password,
-    //   })
-    //   .then((res) => {
-    //     saveToAsyncStorage(
-    //       res.data.token,
-    //       res.data.userId,
-    //       res.data.expiryDate
-    //     );
-    //     props.onScreenChange("todo");
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     Alert.alert(
-    //       "An error occured",
-    //       (err.response && err.response.data.message) || err.message,
-    //       [{ text: "Okay" }]
-    //     );
-    //     setIsLoading(false);
-    //   });
   };
 
   const login = () => {
@@ -132,30 +106,7 @@ const AuthScreen = ({ signup = false, ...props }) => {
       handleSuccess,
       handleFailure
     );
-    // axios
-    //   .post("/user/login", {
-    //     email: formState.inputValues.email,
-    //     pass: formState.inputValues.password,
-    //   })
-    //   .then((res) => {
-    //     saveToAsyncStorage(
-    //       res.data.token,
-    //       res.data.userId,
-    //       res.data.expiryDate
-    //     );
-    //     props.onScreenChange("todo");
-    //   })
-    //   .catch((err) => {
-    //     Alert.alert(
-    //       "An error occured",
-    //       (err.response && err.response.data.message) || err.message,
-    //       [{ text: "Okay" }]
-    //     );
-    //     setIsLoading(false);
-    //   });
   };
-
-  // console.log(formState);
 
   const authHandler = async () => {
     let action;

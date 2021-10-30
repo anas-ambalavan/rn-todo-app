@@ -3,7 +3,7 @@ import axios from "./axios/";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, ActivityIndicator } from "react-native";
 import Colors from "./constants/Colors";
-import AppNavigator from "./navigation/AppNavigator";
+
 import AuthScreen from "./screens/AuthScreen";
 
 import TodoScreen from "./screens/TodoScreen";
