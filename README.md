@@ -11,4 +11,6 @@
   Press i: open iOS simulator
 ```  
 
+## Run on Expo Client App
+https://expo.dev/@anas.ambalavan/todo-app
 
