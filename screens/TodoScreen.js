@@ -8,6 +8,7 @@ import {
   Alert,
   Platform,
   KeyboardAvoidingView,
+  TouchableOpacity,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
@@ -16,6 +17,7 @@ import HeaderTab from "../components/HeaderTab";
 import TodoListItem from "../components/TodoListItem";
 
 import useHttp from "../hooks/useHttp";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const TodoScreen = (props) => {
   const [activeTab, setActiveTab] = useState("All");
@@ -125,6 +127,11 @@ const TodoScreen = (props) => {
     );
   };
 
+  const onLogout = () => {
+    AsyncStorage.removeItem("userData");
+    props.onScreenChange("login");
+  };
+
   useEffect(() => {
     const handleSuccess = (res) => {
       setItems(
@@ -161,6 +168,12 @@ const TodoScreen = (props) => {
     >
       {/* <View > */}
       <Text style={styles.headerText}>Todo App</Text>
+      <TouchableOpacity
+        onPress={() => onLogout()}
+        style={{ position: "absolute", top: 20, right: 20 }}
+      >
+        <Text>Logout</Text>
+      </TouchableOpacity>
       <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} />
       <AddTodoItem addItem={addItem} />
 
